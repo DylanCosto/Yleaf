@@ -710,7 +710,8 @@ def samtools(
     bed = output_folder / "temp_position_bed.bed"
     write_bed_file(bed, position_file, header)
 
-    execute_mpileup(bed, path_file, pileupfile, args.quality_thresh, reference)
+    execute_mpileup(bed, path_file, pileupfile, args.quality_thresh, reference,
+                    region=header)
 
     general_info_list = ["Total of mapped reads: " + str(mapped), "Total of unmapped reads: " + str(unmapped)]
 
@@ -811,11 +812,14 @@ def execute_mpileup(
         bam_file: Path,
         pileupfile: Path,
         quality_thresh: float,
-        reference: Union[Path, None]
+        reference: Union[Path, None],
+        region: Union[str, None] = None
 ):
     cmd = "samtools mpileup"
     if bed is not None:
         cmd += f" -l {str(bed)}"
+    if region is not None:
+        cmd += f' -r "{region}"'
 
     if reference is not None:
         cmd += f" -f {str(reference)}"
